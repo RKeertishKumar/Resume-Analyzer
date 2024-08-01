@@ -13,7 +13,7 @@ def gemini_api_response(resume_info,path_info):
 
     model = genai.GenerativeModel('gemini-1.5-flash')
 
-    response = model.generate_content(f"Roadmap for {path_info} role in 5 points based on weakness in {resume_info}")
+    response = model.generate_content(f"Roadmap for {path_info} role in 5 points based on weakness in {resume_info}. Also, 3 interview question and answer.")
     suggesetion = response.text
     return suggesetion
 
@@ -22,7 +22,7 @@ def gemini_api_response_job_role(resume_info,path_info,job_role):
 
     model = genai.GenerativeModel('gemini-1.5-flash')
 
-    response = model.generate_content(f"Roadmap for {path_info} role in 5 points based on weakness in {resume_info} for {job_role}")
+    response = model.generate_content(f"Roadmap for {path_info} role in 5 points based on weakness in {resume_info} for {job_role}.Also, 3 interview question and answer.")
     suggesetion = response.text
     return suggesetion
 
