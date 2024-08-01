@@ -4,8 +4,47 @@ import os
 from genai_api import gemini_api_response, gemini_api_response_job_role
 import re
 from jobroles import jobroles
+from gtts import gTTS
+
 app = Flask(__name__)
 technical_content = None  # Global variable for storing PDF content
+
+def remove_html_tags(text):
+    clean_text = re.sub(r'<[^>]+>', '', text)
+    return clean_text
+
+def text_to_audio(text, language_code, file_path='output.mp3'):
+    # Create gTTS object
+    tts = gTTS(text=text, lang=language_code)
+    # Save the audio file
+    tts.save(file_path)
+    
+def get_language_code(language_name):
+    language_codes = {
+        'hindi': 'hi',
+        'bengali': 'bn',
+        'telugu': 'te',
+        'marathi': 'mr',
+        'tamil': 'ta',
+        'urdu': 'ur',
+        'gujarati': 'gu',
+        'malayalam': 'ml',
+        'kannada': 'kn',
+        'odia': 'or',
+        'punjabi': 'pa',
+        'assamese': 'as',
+        'maithili': 'mai',
+        'santali': 'sat',
+        'konkani': 'kok',
+        'nepali': 'ne',
+        'sanskrit': 'sa',
+        'sindhi': 'sd',
+        'kashmiri': 'ks',
+        'manipuri': 'mni',
+        'bodo': 'brx',
+        'dogri': 'doi'
+        # Add more languages if needed
+    }
 
 def format_text_to_html(text):
     # Replace headers
@@ -92,7 +131,13 @@ def chat():
             roadmap = f"{roadmap} (explain in {language})"
         reply = gemini_api_response(technical_content, roadmap)
     reply = format_text_to_html(reply)
-    return jsonify({'reply': reply})
+    
+    lang_code = get_language_code(language) or 'en'  # Default to English if no language code is found
+    audio_file = 'static/output.mp3'
+    audio_reply = remove_html_tags(reply)
+    text_to_audio(audio_reply, lang_code, audio_file)
+    
+    return jsonify({'reply': reply, 'audio_file': '/static/output.mp3'})
 
 @app.route('/upload', methods=['POST'])
 def upload():

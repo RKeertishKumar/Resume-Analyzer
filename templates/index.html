@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat and PDF Upload Interface</title>
+    <title>Resume Analyzer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,6 +57,12 @@
         <div class="input-container">
             <input type="text" id="user-input" placeholder="Type your preferred job role here along with preferred language" autofocus>
             <button onclick="sendMessage()">Send</button>
+        </div>
+        <div id="audio-player" style="margin-top: 20px;">
+            <audio id="audio" controls>
+                <source id="audio-source" src="/static/output.mp3" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
         </div>
     </div>
 
@@ -148,6 +154,15 @@
 
             const data = await response.json();
             document.getElementById('combined-output').innerHTML = data.combined_output || data.error || 'Unknown error occurred';
+
+            if (data.audio_file) {
+                const audioElement = document.getElementById('audio');
+                const audioSource = document.getElementById('audio-source');
+                audioSource.src = data.audio_file;
+                audioElement.load(); // Load the new audio file
+                audioElement.play();
+            }
+        
         }
 
         function appendMessage(message, className) {
