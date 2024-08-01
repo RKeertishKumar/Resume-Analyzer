@@ -49,15 +49,21 @@
     </style>
 </head>
 <body>
-    <h1>Chat and PDF Upload Interface</h1>
+    <h1>Resume Analyzer</h1>
 
     <!-- Chat Interface -->
     <div class="chat-container">
         <div id="chat-box"></div>
         <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message here..." autofocus>
+            <input type="text" id="user-input" placeholder="Type your preferred job role here along with preferred language" autofocus>
             <button onclick="sendMessage()">Send</button>
         </div>
+    </div>
+
+    <div class="input-container">
+        <label for="language-input">Add Language:</label>
+        <input type="text" id="language-input" name="language" placeholder="Enter a language (default English)">
+        <button onclick="addLanguage()">Add</button>
     </div>
 
     <!-- PDF Upload -->
@@ -67,6 +73,16 @@
             <button type="button" onclick="uploadFile()">Upload PDF</button>
         </form>
         <div id="pdf-content"></div>
+    </div>
+    <div class="input-container">
+        <label for="job-role">Current Market Expectations for:</label>
+        <select id="job-role">
+            <option value="None">None</option>
+            <option value="MS_Sr_Dev">Microsoft - Senior Software Engineer</option>
+            <option value="MS_SE_2">Microsoft - System Engineer 2</option>
+            <option value="G_SWE">Google - Software Engineer</option>
+            <!-- Add more job roles as needed -->
+        </select>
     </div>
 
     <!-- Combined Output -->
@@ -81,6 +97,8 @@
 
         async function sendMessage() {
             chatMessage = document.getElementById('user-input').value.trim();
+            const jobRole = document.getElementById('job-role').value;
+            const language = document.getElementById('language-input').value.trim();
             if (chatMessage === "") return;
 
             appendMessage(chatMessage, 'user-message');
@@ -91,7 +109,7 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: chatMessage })
+                body: JSON.stringify({ message: chatMessage, jobRole: jobRole, language: language })
             });
             const data = await response.json();
             appendMessage(data.reply, 'bot-message');
@@ -118,6 +136,7 @@
         async function processInputs() {
             const formData = new FormData();
             formData.append('chat_message', chatMessage);
+            formData.append('job_role', document.getElementById('job-role').value);
             if (file) {
                 formData.append('file', file);
             }

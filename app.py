@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 import pdfplumber
 import os
-from genai_api import gemini_api_response
+from genai_api import gemini_api_response, gemini_api_response_job_role
 import re
+from jobroles import jobroles
 app = Flask(__name__)
 technical_content = None  # Global variable for storing PDF content
 
@@ -72,11 +73,24 @@ def index():
 def chat():
     global technical_content  # Declare as global to access the variable
     roadmap = request.json.get('message')
-    # Ensure technical_content is available
+    job_role = request.json.get('jobRole')
+    language = request.json.get('language')
+    if job_role == "None":
+        job_role = False
+    if language == "":
+        language = False
     if technical_content is None:
-        return jsonify({'error': 'No technical content available'}), 400
+        return jsonify({'error': 'No technical content about user available'}), 400
     # Use gemini_api_response with the technical content and roadmap
-    reply = gemini_api_response(technical_content, roadmap)
+    if job_role:
+        job_role = jobroles[job_role]
+        if language:
+            roadmap = f"{roadmap} (explain in {language})"
+        reply = gemini_api_response_job_role(technical_content, roadmap, job_role)
+    else:
+        if language:
+            roadmap = f"{roadmap} (explain in {language})"
+        reply = gemini_api_response(technical_content, roadmap)
     reply = format_text_to_html(reply)
     return jsonify({'reply': reply})
 
